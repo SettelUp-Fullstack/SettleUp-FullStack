@@ -1,0 +1,160 @@
+<div class="balances-container">
+  <div class="balances-page">
+
+    <!-- Header with All Groups Button -->
+    <div class="balances-header">
+      <div>
+        <h1>Balances</h1>
+        <p class="balances-subtitle">View who owes whom</p>
+      </div>
+      <button class="all-groups-btn" (click)="toggleGroupsList()">
+        <span class="btn-icon">??</span>
+        All Groups
+        <span class="btn-count">{{ userGroups.length }}</span>
+      </button>
+    </div>
+
+    <!-- Groups List Dropdown/Panel -->
+    <div class="groups-panel" *ngIf="showGroupsList">
+      <div class="groups-panel-header">
+        <h3>Your Groups</h3>
+        <button class="close-panel" (click)="toggleGroupsList()">×</button>
+      </div>
+      <div class="groups-list">
+        <div class="group-item" *ngFor="let group of userGroups" (click)="selectGroup(group)" [class.active]="selectedGroup?._id === group._id">
+          <div class="group-info">
+            <span class="group-name">{{ group.name }}</span>
+            <span class="group-type">{{ group.type }}</span>
+          </div>
+          <span class="group-members">{{ group.members ? group.members.length : 0 }} members</span>
+        </div>
+      </div>
+      <div class="groups-panel-footer">
+        <button class="view-all-btn" (click)="viewAllGroups()">View All Balances</button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading && !errorMessage">
+      <div class="spinner"></div>
+      <p>Loading balances...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="errorMessage && !isLoading">
+      <div class="error-icon">??</div>
+      <h4>Error Loading Balances</h4>
+      <p>{{ errorMessage }}</p>
+      <button class="retry-btn" (click)="retryLoading()">Retry</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards" *ngIf="!isLoading && !errorMessage && balancesData">
+      <!-- You Are Owed Card -->
+      <div class="summary-card owed-card">
+        <div class="card-icon">$</div>
+        <div class="card-content">
+          <span class="card-label">You Are Owed</span>
+          <span class="card-value">${{ balancesData.summary.youAreOwed | number:'1.2-2' }}</span>
+          <span class="card-subtext">Total receivable</span>
+        </div>
+      </div>
+
+      <!-- You Owe Card -->
+      <div class="summary-card owe-card">
+        <div class="card-icon">$</div>
+        <div class="card-content">
+          <span class="card-label">You Owe</span>
+          <span class="card-value">${{ balancesData.summary.youOwe | number:'1.2-2' }}</span>
+          <span class="card-subtext">Total payable</span>
+        </div>
+      </div>
+
+      <!-- Net Balance Card -->
+      <div class="summary-card net-card" [class.positive]="balancesData.summary.netBalance >= 0" [class.negative]="balancesData.summary.netBalance < 0">
+        <div class="card-icon">=</div>
+        <div class="card-content">
+          <span class="card-label">Net Balance</span>
+          <span class="card-value">${{ Math.abs(balancesData.summary.netBalance) | number:'1.2-2' }}</span>
+          <span class="card-subtext">{{ balancesData.summary.netBalance >= 0 ? 'In your favor' : 'You owe' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Selection Indicator -->
+    <div class="group-indicator" *ngIf="selectedGroup">
+      <span class="indicator-label">Showing balances for:</span>
+      <span class="indicator-group">{{ selectedGroup.name }}</span>
+      <button class="clear-group" (click)="clearGroupSelection()">×</button>
+    </div>
+
+    <!-- Individual Balances Section -->
+    <div class="balances-section" *ngIf="!isLoading && !errorMessage && balancesData">
+      <div class="section-header">
+        <h3>Individual Balances</h3>
+        <span class="section-subtitle">{{ selectedGroup ? selectedGroup.name + ' balances' : 'All groups combined' }}</span>
+      </div>
+
+      <!-- Balances List -->
+      <div class="balances-list" *ngIf="hasIndividualBalances">
+        <div class="balance-card" *ngFor="let balance of balancesData.individualBalances; trackBy: trackByEmail">
+          <div class="user-info">
+            <div class="user-avatar">{{ getInitials(balance.name) }}</div>
+            <div class="user-details">
+              <span class="user-name">{{ balance.name }}</span>
+              <span class="user-email">{{ balance.email }}</span>
+            </div>
+          </div>
+          <div class="balance-amount" [class.positive]="balance.amount > 0" [class.negative]="balance.amount < 0">
+            <span class="amount-sign">{{ balance.amount > 0 ? '+' : '' }}{{ balance.amount < 0 ? '-' : '' }}</span>
+            <span class="amount-value">${{ Math.abs(balance.amount) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!hasIndividualBalances">
+        <div class="empty-icon">?</div>
+        <h4>No balances yet</h4>
+        <p>Add expenses to see who owes whom</p>
+        <button class="create-btn" routerLink="/expenses">Add Expense</button>
+      </div>
+    </div>
+
+    <!-- Suggested Settlements Section -->
+    <div class="settlements-section" *ngIf="!isLoading && !errorMessage && balancesData">
+      <div class="section-header">
+        <h3>Suggested Settlements</h3>
+        <span class="section-subtitle">Simplified payment plan to settle all debts</span>
+      </div>
+
+      <!-- Settlements List -->
+      <div class="settlements-list" *ngIf="hasSettlements">
+        <div class="settlement-card" *ngFor="let settlement of balancesData.settlements; trackBy: trackBySettlement">
+          <div class="settlement-arrow">?</div>
+          <div class="from-user">
+            <div class="user-avatar small">{{ getInitials(settlement.fromName) }}</div>
+            <span class="user-name">{{ settlement.fromName }}</span>
+          </div>
+          <div class="settlement-amount">${{ settlement.amount | number:'1.2-2' }}</div>
+          <div class="to-user">
+            <span class="user-name">{{ settlement.toName }}</span>
+            <div class="user-avatar small">{{ getInitials(settlement.toName) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Settled Up State -->
+      <div class="settled-up-card" *ngIf="!hasSettlements">
+        <div class="settled-icon">?</div>
+        <h4>All settled up!</h4>
+        <p>No outstanding balances</p>
+      </div>
+    </div>
+
+    <!-- Refresh Button -->
+    <button class="refresh-btn" *ngIf="!isLoading && balancesData" (click)="refreshBalances()">
+      ? Refresh
+    </button>
+  </div>
+</div>

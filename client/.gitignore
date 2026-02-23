@@ -1,0 +1,19 @@
+# Node modules
+node_modules/
+
+# Angular build files
+dist/
+.angular/
+.tmp/
+
+# Environment files
+.env
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Coverage
+coverage/

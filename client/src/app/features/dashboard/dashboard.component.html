@@ -1,0 +1,137 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h2>Dashboard</h2>
+    <p class="subtitle">Overview of your expenses and balances</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading dashboard...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <div class="error-icon">⚠️</div>
+    <h4>Error Loading Dashboard</h4>
+    <p>{{ errorMessage }}</p>
+    <button class="retry-btn" (click)="retryLoading()">Retry</button>
+  </div>
+
+  <!-- Stats Cards - Dynamic Data -->
+  <div class="cards" *ngIf="!isLoading && !errorMessage && dashboardData">
+    <div class="card">
+      <div class="card-label">Total Groups</div>
+      <div class="card-value">{{ dashboardData.stats.totalGroups }}</div>
+      <div class="card-sub">Active groups</div>
+    </div>
+    
+    <div class="card">
+      <div class="card-label">Total Expenses</div>
+      <div class="card-value">${{ dashboardData.stats.totalExpenses.amount | number:'1.2-2' }}</div>
+      <div class="card-sub">{{ dashboardData.stats.totalExpenses.count }} transactions</div>
+    </div>
+    
+    <div class="card" [class.green]="dashboardData.stats.yourBalance.netBalance >= 0">
+      <div class="card-label">Your Balance</div>
+      <div class="card-value">${{ Math.abs(dashboardData.stats.yourBalance.netBalance) | number:'1.2-2' }}</div>
+      <div class="card-sub">
+        {{ dashboardData.stats.yourBalance.netBalance >= 0 ? 'You are owed' : 'You owe' }}
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-label">Unsettled</div>
+      <div class="card-value">{{ dashboardData.stats.unsettled }}</div>
+      <div class="card-sub">Pending expenses</div>
+    </div>
+  </div>
+
+  <!-- Additional Stats Row -->
+  <div class="stats-row" *ngIf="!isLoading && !errorMessage && dashboardData">
+    <div class="stat-item">
+      <span class="stat-label">Pending Settlements</span>
+      <span class="stat-value">{{ dashboardData.stats.pendingSettlements }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Completed Settlements</span>
+      <span class="stat-value">{{ dashboardData.stats.completedSettlements }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">You Are Owed</span>
+      <span class="stat-value positive">${{ dashboardData.stats.yourBalance.youAreOwed | number:'1.2-2' }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">You Owe</span>
+      <span class="stat-value negative">${{ dashboardData.stats.yourBalance.youOwe | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- Recent Sections -->
+  <div class="recent-sections" *ngIf="!isLoading && !errorMessage && dashboardData">
+    <!-- Recent Groups -->
+    <div class="recent-box">
+      <div class="recent-header">
+        <h3>Recent Groups</h3>
+        <span class="sub-text">Your most recent expense groups</span>
+      </div>
+      
+      <div class="recent-list" *ngIf="dashboardData.recentGroups.length > 0">
+        <div class="recent-item" *ngFor="let group of dashboardData.recentGroups; trackBy: trackByGroupId">
+          <div class="item-left">
+            <div class="item-name">{{ group.name }}</div>
+            <div class="item-type">{{ group.type }}</div>
+          </div>
+          <div class="item-right">
+            <div class="item-date">{{ group.createdAt | date:'MMM d, yyyy' }}</div>
+            <!-- FIXED: Replaced optional chain with direct property access -->
+            <div class="item-members">{{ group.members ? group.members.length : 0 }} members</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="dashboardData.recentGroups.length === 0">
+        <p>No groups yet. Create one to get started!</p>
+        <button class="create-btn" routerLink="/groups">Create Group</button>
+      </div>
+    </div>
+
+    <!-- Recent Expenses -->
+    <div class="recent-box">
+      <div class="recent-header">
+        <h3>Recent Expenses</h3>
+        <span class="sub-text">Latest expense transactions</span>
+      </div>
+      
+      <div class="recent-list" *ngIf="dashboardData.recentExpenses.length > 0">
+        <div class="recent-item expense-item" *ngFor="let expense of dashboardData.recentExpenses; trackBy: trackByExpenseId">
+          <div class="item-left">
+            <div class="item-name">{{ expense.description }}</div>
+            <!-- FIXED: Replaced optional chain with safe method call -->
+            <div class="item-category" [ngClass]="expense.category ? expense.category.toLowerCase() : 'other'">
+              {{ expense.category || 'Other' }}
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-amount">${{ expense.amount | number:'1.2-2' }}</div>
+            <div class="item-group">{{ expense.groupName }}</div>
+            <div class="item-date">{{ expense.date | date:'MMM d' }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="dashboardData.recentExpenses.length === 0">
+        <p>No expenses yet. Add one to start tracking!</p>
+        <button class="create-btn" routerLink="/expenses">Add Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions" *ngIf="!isLoading && !errorMessage">
+    <button class="action-btn" routerLink="/groups">+ New Group</button>
+    <button class="action-btn" routerLink="/expenses">+ Add Expense</button>
+    <button class="action-btn" routerLink="/settlements">View Settlements</button>
+    <button class="action-btn refresh" (click)="refreshDashboard()">⟳ Refresh</button>
+  </div>
+</div>

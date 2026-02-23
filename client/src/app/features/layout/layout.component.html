@@ -1,0 +1,36 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="top">
+      <div class="logo-container">
+        <img *ngIf="logoLoaded" [src]="logoPath" alt="SettleUp Logo" class="logo-img">
+        <span *ngIf="!logoLoaded" class="logo-fallback"></span>
+        <span class="logo-text">SettleUp</span>
+      </div>
+      <nav>
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Dashboard</a>
+        <a routerLink="/groups" routerLinkActive="active">Groups</a>
+        <a routerLink="/expenses" routerLinkActive="active">Expenses</a>
+        <a routerLink="/balances" routerLinkActive="active">Balances</a>
+        <a routerLink="/settlements" routerLinkActive="active">Settlements</a>
+      </nav>
+    </div>
+
+    <!-- bottom profile -->
+    <div class="bottom">
+      <div class="profile">
+        <div class="avatar">{{ user.avatar || getInitials(user.name) }}</div>
+        <div class="profile-info">
+          <div class="name">{{ user.name || 'Guest' }}</div>
+          <div class="email">{{ user.email || 'guest@example.com' }}</div>
+        </div>
+      </div>
+      <button class="logout" (click)="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
