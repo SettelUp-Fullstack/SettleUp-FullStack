@@ -46,25 +46,20 @@ export class ExpensesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log('ExpensesComponent - Initializing');
-    
     this.subscriptions.push(
       this.expenseService.expenses$.subscribe(expenses => {
-        console.log('ExpensesComponent - Expenses updated:', expenses?.length);
         this.expenses = expenses || [];
       })
     );
 
     this.subscriptions.push(
       this.groupService.groups$.subscribe(groups => {
-        console.log('ExpensesComponent - Groups updated:', groups?.length);
         this.userGroups = groups || [];
       })
     );
 
     this.subscriptions.push(
       this.expenseService.loading$.subscribe(loading => {
-        console.log('ExpensesComponent - Loading state:', loading);
         this.isLoading = loading;
       })
     );
@@ -77,8 +72,6 @@ export class ExpensesComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
-    console.log('ExpensesComponent - Loading data');
-    
     this.groupService.fetchGroups().subscribe({
       error: (error) => console.error('Error loading groups:', error)
     });
@@ -150,7 +143,7 @@ export class ExpensesComponent implements OnInit, OnDestroy {
     const expenseAmount = parseFloat(this.newExpense.amount);
     
     if (Math.abs(total - expenseAmount) > 0.01) {
-      this.errorMessage = `Total $${total.toFixed(2)} must equal $${expenseAmount.toFixed(2)}`;
+      this.errorMessage = `Total ${total.toFixed(2)} must equal ${expenseAmount.toFixed(2)}`;
     } else {
       this.errorMessage = null;
     }
@@ -223,8 +216,7 @@ export class ExpensesComponent implements OnInit, OnDestroy {
     };
 
     this.expenseService.createExpense(expenseData).subscribe({
-      next: (response) => {
-        console.log('Expense created:', response);
+      next: () => {
         this.closeModal();
         this.isSubmitting = false;
       },
@@ -257,5 +249,13 @@ export class ExpensesComponent implements OnInit, OnDestroy {
 
   trackByExpenseId(index: number, expense: Expense): string {
     return expense._id || index.toString();
+  }
+
+  trackByGroupId(index: number, group: any): string {
+    return group._id || index.toString();
+  }
+
+  trackByMemberEmail(index: number, member: any): string {
+    return member.email || index.toString();
   }
 }

@@ -57,32 +57,26 @@ export class SettlementsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log('SettlementsComponent - Initializing');
-    
     this.subscriptions.push(
       this.settlementService.history$.subscribe(history => {
-        console.log('SettlementsComponent - History received:', history?.length);
         this.history = history || [];
       })
     );
 
     this.subscriptions.push(
       this.settlementService.stats$.subscribe(stats => {
-        console.log('SettlementsComponent - Stats received:', stats);
         this.stats = stats;
       })
     );
 
     this.subscriptions.push(
       this.groupService.groups$.subscribe(groups => {
-        console.log('SettlementsComponent - Groups received:', groups?.length);
         this.userGroups = groups || [];
       })
     );
 
     this.subscriptions.push(
       this.settlementService.loading$.subscribe(loading => {
-        console.log('SettlementsComponent - Loading state:', loading);
         this.isLoading = loading;
       })
     );
@@ -95,8 +89,6 @@ export class SettlementsComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
-    console.log('SettlementsComponent - Loading data');
-    
     Promise.all([
       this.settlementService.fetchHistory().toPromise(),
       this.settlementService.fetchStats().toPromise(),
@@ -172,7 +164,7 @@ export class SettlementsComponent implements OnInit, OnDestroy {
 
   toggleExpenseSelection(expenseId: string, event: any) {
     if (!expenseId) return;
-    
+
     if (event.target.checked) {
       if (!this.selectedExpenses.includes(expenseId)) {
         this.selectedExpenses.push(expenseId);
@@ -231,7 +223,7 @@ export class SettlementsComponent implements OnInit, OnDestroy {
       console.error('Cannot mark settlement as completed: No ID provided');
       return;
     }
-    
+
     if (!confirm('Mark this settlement as completed?')) return;
 
     this.settlementService.completeSettlement(settlementId).subscribe({
@@ -250,5 +242,17 @@ export class SettlementsComponent implements OnInit, OnDestroy {
       .join('')
       .toUpperCase()
       .substring(0, 2);
+  }
+
+  trackByHistoryId(index: number, item: SettlementHistory): string {
+    return item.id || index.toString();
+  }
+
+  trackByGroupId(index: number, group: any): string {
+    return group._id || index.toString();
+  }
+
+  trackByMemberEmail(index: number, member: any): string {
+    return member.email || index.toString();
   }
 }

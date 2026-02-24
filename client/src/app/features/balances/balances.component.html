@@ -1,4 +1,4 @@
-<div class="balances-container">
+﻿<div class="balances-container">
   <div class="balances-page">
 
     <!-- Header with All Groups Button -->
@@ -8,7 +8,7 @@
         <p class="balances-subtitle">View who owes whom</p>
       </div>
       <button class="all-groups-btn" (click)="toggleGroupsList()">
-        <span class="btn-icon">??</span>
+        <span class="btn-icon"></span>
         All Groups
         <span class="btn-count">{{ userGroups.length }}</span>
       </button>
@@ -18,10 +18,10 @@
     <div class="groups-panel" *ngIf="showGroupsList">
       <div class="groups-panel-header">
         <h3>Your Groups</h3>
-        <button class="close-panel" (click)="toggleGroupsList()">�</button>
+        <button class="close-panel" (click)="toggleGroupsList()">✖</button>
       </div>
       <div class="groups-list">
-        <div class="group-item" *ngFor="let group of userGroups" (click)="selectGroup(group)" [class.active]="selectedGroup?._id === group._id">
+        <div class="group-item" *ngFor="let group of userGroups; trackBy: trackByGroupId" (click)="selectGroup(group)" [class.active]="selectedGroup?._id === group._id">
           <div class="group-info">
             <span class="group-name">{{ group.name }}</span>
             <span class="group-type">{{ group.type }}</span>
@@ -52,20 +52,20 @@
     <div class="summary-cards" *ngIf="!isLoading && !errorMessage && balancesData">
       <!-- You Are Owed Card -->
       <div class="summary-card owed-card">
-        <div class="card-icon">$</div>
+        <div class="card-icon">₹</div>
         <div class="card-content">
           <span class="card-label">You Are Owed</span>
-          <span class="card-value">${{ balancesData.summary.youAreOwed | number:'1.2-2' }}</span>
+          <span class="card-value">{{ balancesData.summary.youAreOwed | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
           <span class="card-subtext">Total receivable</span>
         </div>
       </div>
 
       <!-- You Owe Card -->
       <div class="summary-card owe-card">
-        <div class="card-icon">$</div>
+        <div class="card-icon">₹</div>
         <div class="card-content">
           <span class="card-label">You Owe</span>
-          <span class="card-value">${{ balancesData.summary.youOwe | number:'1.2-2' }}</span>
+          <span class="card-value">{{ balancesData.summary.youOwe | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
           <span class="card-subtext">Total payable</span>
         </div>
       </div>
@@ -75,7 +75,7 @@
         <div class="card-icon">=</div>
         <div class="card-content">
           <span class="card-label">Net Balance</span>
-          <span class="card-value">${{ Math.abs(balancesData.summary.netBalance) | number:'1.2-2' }}</span>
+          <span class="card-value">{{ Math.abs(balancesData.summary.netBalance) | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
           <span class="card-subtext">{{ balancesData.summary.netBalance >= 0 ? 'In your favor' : 'You owe' }}</span>
         </div>
       </div>
@@ -85,7 +85,7 @@
     <div class="group-indicator" *ngIf="selectedGroup">
       <span class="indicator-label">Showing balances for:</span>
       <span class="indicator-group">{{ selectedGroup.name }}</span>
-      <button class="clear-group" (click)="clearGroupSelection()">�</button>
+      <button class="clear-group" (click)="clearGroupSelection()">✖</button>
     </div>
 
     <!-- Individual Balances Section -->
@@ -107,14 +107,14 @@
           </div>
           <div class="balance-amount" [class.positive]="balance.amount > 0" [class.negative]="balance.amount < 0">
             <span class="amount-sign">{{ balance.amount > 0 ? '+' : '' }}{{ balance.amount < 0 ? '-' : '' }}</span>
-            <span class="amount-value">${{ Math.abs(balance.amount) | number:'1.2-2' }}</span>
+            <span class="amount-value">{{ Math.abs(balance.amount) | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
           </div>
         </div>
       </div>
 
       <!-- Empty State -->
       <div class="empty-state" *ngIf="!hasIndividualBalances">
-        <div class="empty-icon">?</div>
+        <div class="empty-icon"></div>
         <h4>No balances yet</h4>
         <p>Add expenses to see who owes whom</p>
         <button class="create-btn" routerLink="/expenses">Add Expense</button>
@@ -136,7 +136,7 @@
             <div class="user-avatar small">{{ getInitials(settlement.fromName) }}</div>
             <span class="user-name">{{ settlement.fromName }}</span>
           </div>
-          <div class="settlement-amount">${{ settlement.amount | number:'1.2-2' }}</div>
+          <div class="settlement-amount">{{ settlement.amount | currency:'INR':'symbol':'1.2-2':'en-IN' }}</div>
           <div class="to-user">
             <span class="user-name">{{ settlement.toName }}</span>
             <div class="user-avatar small">{{ getInitials(settlement.toName) }}</div>
@@ -146,7 +146,7 @@
 
       <!-- All Settled Up State -->
       <div class="settled-up-card" *ngIf="!hasSettlements">
-        <div class="settled-icon">?</div>
+        <div class="settled-icon"></div>
         <h4>All settled up!</h4>
         <p>No outstanding balances</p>
       </div>
@@ -154,7 +154,7 @@
 
     <!-- Refresh Button -->
     <button class="refresh-btn" *ngIf="!isLoading && balancesData" (click)="refreshBalances()">
-      ? Refresh
+      ↻ Refresh
     </button>
   </div>
 </div>

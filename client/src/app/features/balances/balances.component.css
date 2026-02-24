@@ -667,8 +667,8 @@
 
 /* REFRESH BUTTON */
 .refresh-btn {
-  background: #141622;
-  border: 1px solid #2a2c3c;
+   background: #8a6cff;
+  border-color: #8a6cff;
   border-radius: 30px;
   padding: 8px 20px;
   color: #ffffff;

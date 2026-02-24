@@ -396,12 +396,15 @@
 
 .action-btn.refresh {
   margin-left: auto;
-  background: #8a6cff;
+     background: #1a1c2a;
   border-color: #8a6cff;
+   transition: all 0.2s ease;
+   
 }
 
-.action-btn.refresh:hover {
-  background: #7b5fe6;
+.refresh-btn:hover {
+  border-color: #8a6cff;
+  background:#8a6cff;
 }
 
 /* Responsive Design */
@@ -457,9 +460,7 @@
     flex-direction: column;
   }
   
-  .action-btn.refresh {
-    margin-left: 0;
-  }
+ 
 }
 
 @media (max-width: 480px) {
@@ -611,7 +612,7 @@
 }
 
 .action-btn.refresh:hover {
-  background: #7b5fe6;
+background: #1a1c2a;
 }
 
 /* Responsive */
@@ -634,9 +635,7 @@
     flex-direction: column;
   }
   
-  .action-btn.refresh {
-    margin-left: 0;
-  }
+
 }
 
 @media (max-width: 480px) {

@@ -1,4 +1,4 @@
-<div class="settlements-container">
+﻿<div class="settlements-container">
   <div class="settlements-page">
 
     <!-- Header -->
@@ -16,36 +16,36 @@
     <!-- Stats Cards -->
     <div class="stats-cards" *ngIf="!isLoading">
       <div class="stat-card">
-        <div class="stat-icon">?</div>
+        <div class="stat-icon">⏳</div>
         <div class="stat-content">
           <span class="stat-label">Pending Settlements</span>
           <span class="stat-value">{{ stats.pendingCount }}</span>
-          <span class="stat-subtext">${{ stats.pendingAmount | number:'1.2-2' }}</span>
+          <span class="stat-subtext">{{ stats.pendingAmount | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">?</div>
+        <div class="stat-icon">✔️</div>
         <div class="stat-content">
           <span class="stat-label">Completed</span>
           <span class="stat-value">{{ stats.completedCount }}</span>
-          <span class="stat-subtext">${{ Math.abs(stats.completedAmount) | number:'1.2-2' }}</span>
+          <span class="stat-subtext">{{ Math.abs(stats.completedAmount) | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">??</div>
+        <div class="stat-icon">📈</div>
         <div class="stat-content">
           <span class="stat-label">Net Settled</span>
           <span class="stat-value" [class.positive]="stats.netSettled >= 0" [class.negative]="stats.netSettled < 0">
-            ${{ Math.abs(stats.netSettled) | number:'1.2-2' }}
+            {{ Math.abs(stats.netSettled) | currency:'INR':'symbol':'1.2-2':'en-IN' }}
           </span>
           <span class="stat-subtext">{{ stats.netSettled >= 0 ? 'You received' : 'You paid' }}</span>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">??</div>
+        <div class="stat-icon">🧾</div>
         <div class="stat-content">
           <span class="stat-label">Total Settlements</span>
           <span class="stat-value">{{ stats.totalSettlements }}</span>
@@ -81,15 +81,15 @@
       </div>
 
       <div class="timeline" *ngIf="history.length > 0">
-        <div class="timeline-item" *ngFor="let item of history">
+        <div class="timeline-item" *ngFor="let item of history; trackBy: trackByHistoryId">
           <div class="timeline-marker" [class.paid]="item.type === 'paid'" [class.received]="item.type === 'received'">
-            <span class="marker-icon">{{ item.type === 'paid' ? '??' : '??' }}</span>
+            <span class="marker-icon">{{ item.type === 'paid' ? '⬤' : '⬤' }}</span>
           </div>
           <div class="timeline-content">
             <div class="settlement-card" [class.paid]="item.type === 'paid'" [class.received]="item.type === 'received'">
               <div class="card-header">
                 <div class="amount-badge" [class.paid]="item.type === 'paid'" [class.received]="item.type === 'received'">
-                  {{ item.type === 'paid' ? '-' : '+' }}${{ item.amount | number:'1.2-2' }}
+                  {{ item.type === 'paid' ? '-' : '+' }}{{ Math.abs(item.amount) | currency:'INR':'symbol':'1.2-2':'en-IN' }}
                 </div>
                 <div class="status-badge" [class.completed]="item.status === 'completed'" [class.pending]="item.status === 'pending'">
                   {{ item.status }}
@@ -110,25 +110,22 @@
                 
                 <div class="meta-info">
                   <div class="date">
-                    <span class="date-icon">??</span>
+                    <span class="date-icon">📅</span>
                     {{ item.date | date:'MMM d, yyyy' }}
                   </div>
                   <div class="payment-method" *ngIf="item.paymentMethod">
-                    <span class="method-icon">??</span>
+                    <span class="method-icon">💵</span>
                     {{ item.paymentMethod }}
                   </div>
                 </div>
 
                 <div class="notes" *ngIf="item.notes">
-                  <span class="notes-icon">??</span>
+                  <span class="notes-icon"></span>
                   {{ item.notes }}
                 </div>
               </div>
 
-              <div class="card-footer" *ngIf="item.status === 'pending'">
-                <button class="mark-complete-btn" (click)="markAsCompleted(item.id)">
-                  Mark as Completed
-                </button>
+             
               </div>
             </div>
           </div>
@@ -136,7 +133,7 @@
       </div>
 
       <div class="empty-state" *ngIf="history.length === 0">
-        <div class="empty-icon">??</div>
+        <div class="empty-icon"></div>
         <h4>No settlement history</h4>
         <p>Create your first settlement to start tracking</p>
         <button class="create-btn" (click)="openNewSettlementModal()">Create Settlement</button>
@@ -151,7 +148,7 @@
       </div>
 
       <div class="empty-state" *ngIf="stats.pendingCount === 0">
-        <div class="empty-icon">?</div>
+        <div class="empty-icon"></div>
         <h4>No pending settlements</h4>
         <p>All your settlements are completed</p>
       </div>
@@ -164,12 +161,7 @@
         <span class="section-subtitle">Settled payments</span>
       </div>
 
-      <div class="empty-state" *ngIf="stats.completedCount === 0">
-        <div class="empty-icon">??</div>
-        <h4>No completed settlements</h4>
-        <p>Your completed settlements will appear here</p>
-      </div>
-    </div>
+      
 
   </div>
 </div>
@@ -179,7 +171,7 @@
   <div class="modal-box" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3>Create New Settlement</h3>
-      <button class="close-btn" (click)="closeModal()">�</button>
+      <button class="close-btn" (click)="closeModal()">✖</button>
     </div>
 
     <div class="modal-body">
@@ -188,7 +180,7 @@
         <label>Select Group</label>
         <select class="form-select" [(ngModel)]="selectedGroupId" (change)="onGroupSelect()">
           <option value="" disabled selected>Choose a group</option>
-          <option *ngFor="let group of userGroups" [value]="group._id">
+          <option *ngFor="let group of userGroups; trackBy: trackByGroupId" [value]="group._id">
             {{ group.name }} ({{ group.members?.length }} members)
           </option>
         </select>
@@ -200,7 +192,7 @@
           <label>From (Payer)</label>
           <select class="form-select" [(ngModel)]="newSettlement.from">
             <option value="" disabled selected>Select payer</option>
-            <option *ngFor="let member of selectedGroup.members" [value]="member.email">
+            <option *ngFor="let member of selectedGroup.members; trackBy: trackByMemberEmail" [value]="member.email">
               {{ member.name }}
             </option>
           </select>
@@ -210,7 +202,7 @@
           <label>To (Receiver)</label>
           <select class="form-select" [(ngModel)]="newSettlement.to">
             <option value="" disabled selected>Select receiver</option>
-            <option *ngFor="let member of selectedGroup.members" [value]="member.email">
+            <option *ngFor="let member of selectedGroup.members; trackBy: trackByMemberEmail" [value]="member.email">
               {{ member.name }}
             </option>
           </select>
@@ -219,7 +211,7 @@
 
       <!-- Amount -->
       <div class="form-group">
-        <label>Amount ($)</label>
+        <label>Amount (₹)</label>
         <input
           type="number"
           class="form-input"

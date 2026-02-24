@@ -31,32 +31,26 @@ export class BalancesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log('BalancesComponent - Initializing');
-    
     this.subscriptions.push(
       this.balanceService.balancesData$.subscribe(data => {
-        console.log('BalancesComponent - Data received:', data);
         this.balancesData = data;
       })
     );
 
     this.subscriptions.push(
       this.balanceService.loading$.subscribe(loading => {
-        console.log('BalancesComponent - Loading state:', loading);
         this.isLoading = loading;
       })
     );
 
     this.subscriptions.push(
       this.balanceService.error$.subscribe(error => {
-        console.log('BalancesComponent - Error state:', error);
         this.errorMessage = error;
       })
     );
 
     this.subscriptions.push(
       this.groupService.groups$.subscribe(groups => {
-        console.log('BalancesComponent - Groups received:', groups);
         this.userGroups = groups || [];
       })
     );
@@ -69,8 +63,6 @@ export class BalancesComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
-    console.log('BalancesComponent - Loading data');
-    
     this.groupService.fetchGroups().subscribe({
       error: (error) => console.error('Error loading groups:', error)
     });
@@ -81,7 +73,6 @@ export class BalancesComponent implements OnInit, OnDestroy {
   }
 
   refreshBalances() {
-    console.log('BalancesComponent - Refreshing balances');
     this.balanceService.refreshBalances();
   }
 
@@ -110,7 +101,6 @@ export class BalancesComponent implements OnInit, OnDestroy {
   selectGroup(group: any) {
     this.selectedGroup = group;
     this.showGroupsList = false;
-    // TODO: Load group-specific balances
   }
 
   clearGroupSelection() {
@@ -133,5 +123,9 @@ export class BalancesComponent implements OnInit, OnDestroy {
 
   trackBySettlement(index: number, settlement: any): string {
     return settlement.from + settlement.to;
+  }
+
+  trackByGroupId(index: number, group: any): string {
+    return group._id || index.toString();
   }
 }

@@ -18,7 +18,7 @@ export class LayoutComponent implements OnInit {
   };
   
   logoPath = '/assets/logo.png';
-  logoLoaded = false;
+  logoLoaded = true;
   
   private isBrowser: boolean;
 
@@ -33,7 +33,6 @@ export class LayoutComponent implements OnInit {
   ngOnInit() {
     if (this.isBrowser) {
       this.loadUserData();
-      this.checkLogo();
     }
   }
 
@@ -80,19 +79,12 @@ export class LayoutComponent implements OnInit {
     }
   }
 
-  checkLogo() {
-    if (this.isBrowser) {
-      const img = new Image();
-      img.onload = () => {
-        this.logoLoaded = true;
-        console.log('Logo loaded successfully');
-      };
-      img.onerror = () => {
-        console.error('Logo failed to load, using fallback');
-        this.logoLoaded = false;
-      };
-      img.src = this.logoPath;
-    }
+  onLogoLoad() {
+    this.logoLoaded = true;
+  }
+
+  onLogoError() {
+    this.logoLoaded = false;
   }
 
   updateUserData(updatedUser: any) {

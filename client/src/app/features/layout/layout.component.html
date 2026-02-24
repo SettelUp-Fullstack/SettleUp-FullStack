@@ -1,10 +1,10 @@
-<div class="layout">
+﻿<div class="layout">
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="top">
       <div class="logo-container">
-        <img *ngIf="logoLoaded" [src]="logoPath" alt="SettleUp Logo" class="logo-img">
-        <span *ngIf="!logoLoaded" class="logo-fallback"></span>
+        <img [src]="logoPath" alt="SettleUp Logo" class="logo-img" [class.hidden]="!logoLoaded" (load)="onLogoLoad()" (error)="onLogoError()">
+        <span *ngIf="!logoLoaded" class="logo-fallback">&#8377;</span>
         <span class="logo-text">SettleUp</span>
       </div>
       <nav>
@@ -34,3 +34,4 @@
     <router-outlet></router-outlet>
   </main>
 </div>
+

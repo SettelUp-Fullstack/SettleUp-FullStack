@@ -377,7 +377,7 @@
 
 .member-input {
   flex: 1;
-  padding: 12px 14px;
+  padding: 12px 12px;
   border: 1px solid #2a2c3c;
   border-radius: 10px;
   background: #0d0e15;
@@ -389,7 +389,7 @@
   background: #8a6cff;
   color: white;
   border: none;
-  padding: 12px 20px;
+  padding: 12px 12px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;

@@ -9,22 +9,20 @@
       <button class="add-expense-btn" (click)="openModal()">+ Add Expense</button>
     </div>
 
-    <!-- Loading State -->
     <div class="loading-state" *ngIf="isLoading && expenses.length === 0">
       <div class="spinner"></div>
       <p>Loading expenses...</p>
     </div>
 
-    <!-- Expenses Grid -->
     <div class="expenses-grid" *ngIf="!isLoading && expenses.length > 0">
       <div class="expense-card" *ngFor="let expense of expenses; trackBy: trackByExpenseId">
         <div class="expense-header">
           <div class="expense-category" [ngClass]="getCategoryClass(expense.category)">
             {{ expense.category || 'Other' }}
           </div>
-          <div class="expense-amount">${{ expense.amount | number:'1.2-2' }}</div>
+          <div class="expense-amount">{{ expense.amount | currency:'INR':'symbol':'1.2-2':'en-IN' }}</div>
         </div>
-        
+
         <div class="expense-body">
           <h3 class="expense-description">{{ expense.description }}</h3>
           <div class="expense-details">
@@ -38,26 +36,25 @@
             </div>
           </div>
         </div>
-        
+
         <div class="expense-footer">
           <div class="paid-by-section">
             <span class="paid-by-label">Paid by:</span>
             <span class="paid-by-value">{{ expense.paidByName || expense.paidBy }}</span>
           </div>
           <div class="split-info">
-            <span class="split-icon">??</span>
+            <span class="split-icon"></span>
             <span class="split-text">Split {{ expense.splits?.length || 0 }} ways</span>
           </div>
           <button class="delete-expense-btn" (click)="deleteExpense(expense._id)" title="Delete expense">
-            <span class="delete-icon">×</span>
+            <span class="delete-icon">ðŸ—‘</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Empty State -->
     <div class="empty-expense-card" *ngIf="!isLoading && expenses.length === 0">
-      <div class="empty-icon">??</div>
+      <div class="empty-icon"></div>
       <h3>No expenses yet</h3>
       <p>Add your first expense to start tracking</p>
       <button class="add-expense-btn" (click)="openModal()">Add First Expense</button>
@@ -66,16 +63,14 @@
   </div>
 </div>
 
-<!-- ADD EXPENSE MODAL -->
 <div class="expense-modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="expense-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3>Add New Expense</h3>
-      <button class="close-modal" (click)="closeModal()">×</button>
+      <button class="close-modal" (click)="closeModal()">âœ–</button>
     </div>
 
     <div class="modal-body">
-      <!-- Description -->
       <div class="form-group">
         <label class="form-label">Description</label>
         <input
@@ -87,9 +82,8 @@
         <span class="error-text" *ngIf="formErrors.description">{{ formErrors.description }}</span>
       </div>
 
-      <!-- Amount -->
       <div class="form-group">
-        <label class="form-label">Amount ($)</label>
+        <label class="form-label">Amount  (â‚¹)</label>
         <input
           class="expense-input"
           type="number"
@@ -101,73 +95,66 @@
         <span class="error-text" *ngIf="formErrors.amount">{{ formErrors.amount }}</span>
       </div>
 
-      <!-- Category -->
       <div class="form-group">
         <label class="form-label">Category</label>
         <select class="expense-select" [(ngModel)]="newExpense.category">
-          <option value="Food">?? Food</option>
-          <option value="Travel">?? Travel</option>
-          <option value="Shopping">??? Shopping</option>
-          <option value="Entertainment">?? Entertainment</option>
-          <option value="Bills">?? Bills</option>
-          <option value="Other">?? Other</option>
+          <option value="Food">Food</option>
+          <option value="Travel">Travel</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Bills">Bills</option>
+          <option value="Other">Other</option>
         </select>
       </div>
 
-      <!-- Group Selection -->
       <div class="form-group">
         <label class="form-label">Group</label>
-        <select 
-          class="expense-select" 
+        <select
+          class="expense-select"
           [(ngModel)]="newExpense.group"
           (change)="onGroupChange()"
           [class.error]="formErrors.group">
           <option value="" disabled selected>Select a group</option>
-          <option *ngFor="let group of userGroups" [value]="group._id">
+          <option *ngFor="let group of userGroups; trackBy: trackByGroupId" [value]="group._id">
             {{ group.name }} ({{ group.members?.length || 0 }} members)
           </option>
         </select>
         <span class="error-text" *ngIf="formErrors.group">{{ formErrors.group }}</span>
       </div>
 
-      <!-- Paid By -->
       <div class="form-group" *ngIf="selectedGroup">
         <label class="form-label">Paid By</label>
         <select class="expense-select" [(ngModel)]="newExpense.paidBy" [class.error]="formErrors.paidBy">
           <option value="" disabled selected>Select who paid</option>
-          <option *ngFor="let member of getSelectedGroupMembers()" [value]="member.email">
+          <option *ngFor="let member of getSelectedGroupMembers(); trackBy: trackByMemberEmail" [value]="member.email">
             {{ member.name }} ({{ member.email }})
           </option>
         </select>
         <span class="error-text" *ngIf="formErrors.paidBy">{{ formErrors.paidBy }}</span>
       </div>
 
-      <!-- Split Type -->
       <div class="form-group" *ngIf="selectedGroup">
         <label class="form-label">Split Type</label>
         <div class="split-options">
-          <button 
-            class="split-option" 
+          <button
+            class="split-option"
             [class.active]="splitType === 'equal'"
             (click)="setSplitType('equal')">
-            <span class="split-icon">??</span>
             <span>Split Equally</span>
           </button>
-          <button 
-            class="split-option" 
+          <button
+            class="split-option"
             [class.active]="splitType === 'exact'"
             (click)="setSplitType('exact')">
-            <span class="split-icon">??</span>
             <span>Exact Amount</span>
           </button>
         </div>
       </div>
 
-      <!-- Split Amounts -->
       <div class="split-section" *ngIf="selectedGroup && splitType === 'exact'">
         <label class="form-label">Split Amounts</label>
         <div class="split-inputs">
-          <div class="split-row" *ngFor="let member of getSelectedGroupMembers()">
+          <div class="split-row" *ngFor="let member of getSelectedGroupMembers(); trackBy: trackByMemberEmail">
             <span class="member-name">{{ member.name }}</span>
             <input
               type="number"
@@ -178,16 +165,15 @@
           </div>
         </div>
         <div class="split-total" [class.error]="errorMessage">
-          <span>Total: ${{ getSplitTotal() | number:'1.2-2' }} / ${{ newExpense.amount | number:'1.2-2' }}</span>
+          <span>Total: {{ getSplitTotal() | currency:'INR':'symbol':'1.2-2':'en-IN' }} / {{ (newExpense.amount || 0) | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
           <span class="error-message" *ngIf="errorMessage">{{ errorMessage }}</span>
         </div>
       </div>
 
-      <!-- Equal Split Summary -->
       <div class="equal-split-summary" *ngIf="selectedGroup && splitType === 'equal' && newExpense.amount">
         <div class="summary-row">
           <span>Each pays:</span>
-          <span class="summary-amount">${{ (newExpense.amount / selectedGroup.members.length) | number:'1.2-2' }}</span>
+          <span class="summary-amount">{{ (newExpense.amount / selectedGroup.members.length) | currency:'INR':'symbol':'1.2-2':'en-IN' }}</span>
         </div>
         <div class="summary-row">
           <span>Total members:</span>
@@ -198,9 +184,9 @@
 
     <div class="expense-actions">
       <button class="cancel-btn" (click)="closeModal()">Cancel</button>
-      <button 
-        class="create-expense-btn" 
-        (click)="addExpense()" 
+      <button
+        class="create-expense-btn"
+        (click)="addExpense()"
         [disabled]="isSubmitting || errorMessage">
         <span *ngIf="!isSubmitting">Add Expense</span>
         <span *ngIf="isSubmitting">Adding...</span>

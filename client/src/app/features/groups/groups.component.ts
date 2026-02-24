@@ -33,18 +33,14 @@ export class GroupsComponent implements OnInit, OnDestroy {
   constructor(private groupService: GroupService) {}
 
   ngOnInit() {
-    console.log('GroupsComponent - Initializing');
-    
     this.subscriptions.push(
       this.groupService.groups$.subscribe(groups => {
-        console.log('GroupsComponent - Groups updated:', groups?.length);
         this.groups = groups || [];
       })
     );
 
     this.subscriptions.push(
       this.groupService.loading$.subscribe(loading => {
-        console.log('GroupsComponent - Loading state:', loading);
         this.isLoading = loading;
       })
     );
@@ -57,7 +53,6 @@ export class GroupsComponent implements OnInit, OnDestroy {
   }
 
   loadGroups() {
-    console.log('GroupsComponent - Loading groups');
     this.groupService.fetchGroups().subscribe({
       error: (error) => {
         console.error('Error loading groups:', error);
@@ -121,7 +116,6 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
     this.groupService.createGroup(this.newGroup).subscribe({
       next: () => {
-        console.log('Group created successfully');
         this.closeModal();
       },
       error: (error) => {
@@ -139,9 +133,6 @@ export class GroupsComponent implements OnInit, OnDestroy {
     }
 
     this.groupService.deleteGroup(groupId).subscribe({
-      next: () => {
-        console.log('Group deleted successfully');
-      },
       error: (error) => {
         console.error('Error deleting group:', error);
         alert(error.error?.message || 'Error deleting group');
@@ -149,11 +140,11 @@ export class GroupsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getMemberCount(group: Group): number {
-    return group.members?.length || 0;
-  }
-
   trackByGroupId(index: number, group: Group): string {
     return group._id;
+  }
+
+  trackByMember(index: number, member: { email: string }): string {
+    return member.email || index.toString();
   }
 }

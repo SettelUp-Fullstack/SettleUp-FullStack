@@ -23,25 +23,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
-    console.log('DashboardComponent - Initializing');
-    
     this.subscriptions.push(
       this.dashboardService.dashboardData$.subscribe(data => {
-        console.log('DashboardComponent - Data received:', data);
         this.dashboardData = data;
       })
     );
 
     this.subscriptions.push(
       this.dashboardService.loading$.subscribe(loading => {
-        console.log('DashboardComponent - Loading state:', loading);
         this.isLoading = loading;
       })
     );
 
     this.subscriptions.push(
       this.dashboardService.error$.subscribe(error => {
-        console.log('DashboardComponent - Error state:', error);
         this.errorMessage = error;
       })
     );
@@ -54,7 +49,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadDashboardData() {
-    console.log('DashboardComponent - Loading dashboard data');
     this.dashboardService.fetchDashboardStats().subscribe({
       error: (error) => {
         console.error('DashboardComponent - Fetch error:', error);
@@ -63,20 +57,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   refreshDashboard() {
-    console.log('DashboardComponent - Refreshing dashboard');
     this.dashboardService.refreshDashboard();
   }
   
-  get hasRecentGroups(): boolean {
-    return !!(this.dashboardData?.recentGroups && this.dashboardData.recentGroups.length > 0);
-  }
-
-  get hasRecentExpenses(): boolean {
-    return !!(this.dashboardData?.recentExpenses && this.dashboardData.recentExpenses.length > 0);
-  }
-  
   retryLoading() {
-    console.log('DashboardComponent - Retrying load');
     this.errorMessage = null;
     this.loadDashboardData();
   }
