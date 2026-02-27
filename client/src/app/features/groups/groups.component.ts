@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { GroupService, Group } from '../../services/group.service';
 import { Subscription } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-groups',
@@ -30,18 +31,32 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private groupService: GroupService) {}
+  constructor(
+    private groupService: GroupService,
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit() {
+    // Skip data loading during SSR
+    if (!isPlatformBrowser(this.platformId)) {
+      this.isLoading = false;
+      return;
+    }
+
     this.subscriptions.push(
       this.groupService.groups$.subscribe(groups => {
         this.groups = groups || [];
+        // Ensure loading is hidden when data arrives
+        this.isLoading = false;
+        this.cdr.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.groupService.loading$.subscribe(loading => {
         this.isLoading = loading;
+        this.cdr.detectChanges();
       })
     );
 
@@ -56,6 +71,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     this.groupService.fetchGroups().subscribe({
       error: (error) => {
         console.error('Error loading groups:', error);
+        this.isLoading = false;
       }
     });
   }
