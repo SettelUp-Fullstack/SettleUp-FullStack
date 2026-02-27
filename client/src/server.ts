@@ -37,13 +37,23 @@ app.use(
 
 /**
  * Handle all other requests by rendering the Angular application.
+ * If Angular SSR returns null (no route matched), fallback to index.csr.html for SPA routing.
  */
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .then((response) => {
+      if (response) {
+        writeResponseToNodeResponse(response, res);
+      } else {
+        // No Angular route matched, serve index.csr.html for client-side routing
+        res.sendFile(join(browserDistFolder, 'index.csr.html'), (err) => {
+          if (err) {
+            next(err);
+          }
+        });
+      }
+    })
     .catch(next);
 });
 
