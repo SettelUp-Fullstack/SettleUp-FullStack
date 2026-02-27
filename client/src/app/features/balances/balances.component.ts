@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BalanceService, BalancesData } from '../../services/balance.service';
 import { GroupService } from '../../services/group.service';
 import { Subscription } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-balances',
@@ -14,44 +15,62 @@ import { Subscription } from 'rxjs';
 })
 export class BalancesComponent implements OnInit, OnDestroy {
   Math = Math;
-  
+
   balancesData: BalancesData | null = null;
   userGroups: any[] = [];
   selectedGroup: any = null;
-  
+
   isLoading = true;
   errorMessage: string | null = null;
   showGroupsList = false;
-  
+
   private subscriptions: Subscription[] = [];
 
   constructor(
     private balanceService: BalanceService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
+    // Skip data loading during SSR
+    if (!isPlatformBrowser(this.platformId)) {
+      this.isLoading = false;
+      return;
+    }
+
     this.subscriptions.push(
       this.balanceService.balancesData$.subscribe(data => {
         this.balancesData = data;
+        // Ensure loading is hidden when data arrives
+        this.isLoading = false;
+        this.cdr.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.balanceService.loading$.subscribe(loading => {
         this.isLoading = loading;
+        this.cdr.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.balanceService.error$.subscribe(error => {
         this.errorMessage = error;
+        // Hide loading on error
+        if (error) {
+          this.isLoading = false;
+        }
+        this.cdr.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.groupService.groups$.subscribe(groups => {
         this.userGroups = groups || [];
+        this.cdr.detectChanges();
       })
     );
 
@@ -64,11 +83,17 @@ export class BalancesComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.groupService.fetchGroups().subscribe({
-      error: (error) => console.error('Error loading groups:', error)
+      error: (error) => {
+        console.error('Error loading groups:', error);
+        this.isLoading = false;
+      }
     });
 
     this.balanceService.fetchBalances().subscribe({
-      error: (error) => console.error('Error loading balances:', error)
+      error: (error) => {
+        console.error('Error loading balances:', error);
+        this.isLoading = false;
+      }
     });
   }
 
