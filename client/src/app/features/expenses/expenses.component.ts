@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ExpenseService, Expense } from '../../services/expense.service';
 import { GroupService } from '../../services/group.service';
 import { Subscription } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-expenses',
@@ -19,7 +20,7 @@ export class ExpensesComponent implements OnInit, OnDestroy {
   expenses: Expense[] = [];
   userGroups: any[] = [];
   selectedGroup: any = null;
-  
+
   showModal = false;
   isLoading = false;
   isSubmitting = false;
@@ -35,32 +36,47 @@ export class ExpensesComponent implements OnInit, OnDestroy {
 
   splitType: 'equal' | 'exact' = 'equal';
   customSplits: { [key: string]: number } = {};
-  
+
   formErrors: any = {};
 
   private subscriptions: Subscription[] = [];
 
   constructor(
     private expenseService: ExpenseService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
+    // Skip data loading during SSR
+    if (!isPlatformBrowser(this.platformId)) {
+      this.isLoading = false;
+      return;
+    }
+
     this.subscriptions.push(
       this.expenseService.expenses$.subscribe(expenses => {
         this.expenses = expenses || [];
+        // Ensure loading is hidden when expenses data arrives
+        this.isLoading = false;
+        this.cdr.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.groupService.groups$.subscribe(groups => {
         this.userGroups = groups || [];
+        // Optionally also hide loading when groups arrive, but not necessary
+        // this.isLoading = false;
+        this.cdr.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.expenseService.loading$.subscribe(loading => {
         this.isLoading = loading;
+        this.cdr.detectChanges();
       })
     );
 
@@ -73,11 +89,17 @@ export class ExpensesComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.groupService.fetchGroups().subscribe({
-      error: (error) => console.error('Error loading groups:', error)
+      error: (error) => {
+        console.error('Error loading groups:', error);
+        this.isLoading = false;
+      }
     });
 
     this.expenseService.fetchExpenses().subscribe({
-      error: (error) => console.error('Error loading expenses:', error)
+      error: (error) => {
+        console.error('Error loading expenses:', error);
+        this.isLoading = false;
+      }
     });
   }
 
