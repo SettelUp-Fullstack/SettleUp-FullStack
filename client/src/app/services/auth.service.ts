@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -9,7 +9,9 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
 
+  // Your Render backend URL
   private apiUrl = 'https://settleup-fullstack.onrender.com/api';
+
   private isBrowser: boolean;
 
   constructor(
@@ -20,92 +22,100 @@ export class AuthService {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
+  /* ============================
+     AUTH API CALLS
+  ============================ */
+
   login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/login`, credentials);
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials)
+      .pipe(
+        tap(response => {
+          if (response?.token) {
+            this.saveToken(response.token);
+          }
+          if (response?.user) {
+            this.saveUser(response.user);
+          }
+        })
+      );
   }
 
   register(userData: { name: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/register`, userData);
+    return this.http.post<any>(`${this.apiUrl}/auth/register`, userData);
   }
-}
 
-  // Safe localStorage getter
+  /* ============================
+     TOKEN STORAGE
+  ============================ */
+
   getToken(): string | null {
     if (this.isBrowser) {
       try {
         return localStorage.getItem('token');
-      } catch (error) {
-        console.error('Error accessing localStorage:', error);
+      } catch {
         return null;
       }
     }
     return null;
   }
 
-  // Safe localStorage setter
   saveToken(token: string): void {
     if (this.isBrowser) {
       try {
         localStorage.setItem('token', token);
-      } catch (error) {
-        console.error('Error saving to localStorage:', error);
-      }
+      } catch {}
     }
   }
 
-  // Safe localStorage getter for user
+  removeToken(): void {
+    if (this.isBrowser) {
+      localStorage.removeItem('token');
+    }
+  }
+
+  /* ============================
+     USER STORAGE
+  ============================ */
+
   getUser(): any {
     if (this.isBrowser) {
       try {
         const user = localStorage.getItem('user');
         return user ? JSON.parse(user) : null;
-      } catch (error) {
-        console.error('Error accessing localStorage:', error);
+      } catch {
         return null;
       }
     }
     return null;
   }
 
-  // Safe localStorage setter for user
   saveUser(user: any): void {
     if (this.isBrowser) {
       try {
         localStorage.setItem('user', JSON.stringify(user));
-      } catch (error) {
-        console.error('Error saving to localStorage:', error);
-      }
+      } catch {}
     }
   }
 
-  // Logout with navigation
-  logout(): void {
+  removeUser(): void {
     if (this.isBrowser) {
-      try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('registeredUser');
-        console.log('Logout successful');
-        this.router.navigate(['/login']);
-      } catch (error) {
-        console.error('Error during logout:', error);
-        window.location.href = '/login';
-      }
+      localStorage.removeItem('user');
     }
   }
 
-  // Check if user is authenticated
+  /* ============================
+     AUTH STATE
+  ============================ */
+
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
 
-  // Login method
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/login`, credentials);
-  }
-
-  // Register method
-  register(userData: { name: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/register`, userData);
+  logout(): void {
+    if (this.isBrowser) {
+      this.removeToken();
+      this.removeUser();
+      this.router.navigate(['/login']);
+    }
   }
 }
