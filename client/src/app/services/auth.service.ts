@@ -8,7 +8,8 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api';
+
+  private apiUrl = 'https://settleup-fullstack.onrender.com/api';
   private isBrowser: boolean;
 
   constructor(
@@ -18,6 +19,15 @@ export class AuthService {
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
+
+  login(credentials: { email: string; password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/login`, credentials);
+  }
+
+  register(userData: { name: string; email: string; password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/register`, userData);
+  }
+}
 
   // Safe localStorage getter
   getToken(): string | null {
