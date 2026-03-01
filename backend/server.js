@@ -13,7 +13,33 @@ const settlementRoutes = require('./src/routes/settlements.routes');
 const dashboardRoutes = require('./src/routes/dashboard.routes');
 
 const app = express();
+/* ✅ IMPROVED ERROR HANDLING */
+const PORT = process.env.PORT || 3000;
 
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`MongoDB Status: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'}`);
+});
+
+// Handle server errors
+server.on('error', (error) => {
+  console.error('❌ Server Error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use`);
+  }
+  process.exit(1);
+});
+
+// Handle process errors
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
 /* ✅ FIX 1: PRODUCTION CORS */
 const allowedOrigins = [
   'http://localhost:4200',
