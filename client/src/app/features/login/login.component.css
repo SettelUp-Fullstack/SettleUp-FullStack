@@ -1,0 +1,144 @@
+﻿.login-container {
+  min-height: 100vh;
+  background: #0d0e15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-box {
+  background: #141622;
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #2a2c3c;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.logo-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(138, 108, 255, 0.25));
+}
+
+.logo-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: #8a6cff;
+  letter-spacing: 1px;
+}
+
+h2 {
+  color: #ffffff;
+  font-size: 28px;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.subtitle {
+  color: #a0a0b0;
+  margin: 0 0 30px 0;
+  font-size: 15px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  color: #ffffff;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #2a2c3c;
+  border-radius: 12px;
+  background: #0d0e15;
+  color: #ffffff;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #8a6cff;
+  box-shadow: 0 0 0 3px rgba(138, 108, 255, 0.1);
+}
+
+input::placeholder {
+  color: #4a4c5c;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  background: #8a6cff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(138, 108, 255, 0.3);
+}
+
+.login-btn:hover:not(:disabled) {
+  background: #7b5fe6;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(138, 108, 255, 0.4);
+}
+
+.login-btn:disabled {
+  background: #2a2c3c;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 25px;
+  color: #a0a0b0;
+  font-size: 14px;
+}
+
+.register-link a {
+  color: #8a6cff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-box {
+    padding: 30px 20px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+}
+
