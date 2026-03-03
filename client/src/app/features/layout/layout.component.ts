@@ -1,5 +1,5 @@
 import { RouterModule, Router } from '@angular/router';
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
@@ -19,6 +19,7 @@ export class LayoutComponent implements OnInit {
   
   logoPath = '/assets/logo.png';
   logoLoaded = true;
+  isSidebarOpen = false;
   
   private isBrowser: boolean;
 
@@ -77,6 +78,24 @@ export class LayoutComponent implements OnInit {
     if (this.isBrowser) {
       this.authService.logout();
     }
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
+  goToSettings() {
+    this.closeSidebar();
+    this.router.navigate(['/settings']);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    this.closeSidebar();
   }
 
   onLogoLoad() {
