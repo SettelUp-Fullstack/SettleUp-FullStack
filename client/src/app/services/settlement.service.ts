@@ -4,7 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, catchError, timeout, finalize } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface Settlement {
   _id?: string;
