@@ -4,6 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, catchError, timeout, finalize } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 
 export interface Balance {
   email: string;
@@ -37,7 +38,7 @@ export interface BalancesData {
   providedIn: 'root'
 })
 export class BalanceService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = environment.apiUrl;
   private isBrowser: boolean;
 
   private balancesDataSubject = new BehaviorSubject<BalancesData | null>(null);
