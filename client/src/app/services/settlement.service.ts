@@ -4,6 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, catchError, timeout, finalize } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Settlement {
   _id?: string;
@@ -53,7 +54,7 @@ export interface SettlementHistory {
   providedIn: 'root'
 })
 export class SettlementService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = environment.apiUrl;
   private isBrowser: boolean;
 
   private settlementsSubject = new BehaviorSubject<Settlement[]>([]);

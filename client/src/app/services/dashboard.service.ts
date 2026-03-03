@@ -4,6 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, catchError, timeout, retry, finalize } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface DashboardStats {
   totalGroups: number;
@@ -50,7 +51,7 @@ export interface DashboardData {
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = environment.apiUrl;
   private isBrowser: boolean;
 
   private dashboardDataSubject = new BehaviorSubject<DashboardData | null>(null);

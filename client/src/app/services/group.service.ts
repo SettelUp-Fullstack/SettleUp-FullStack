@@ -4,6 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, catchError, shareReplay, timeout, finalize } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Member {
   name: string;
@@ -25,7 +26,7 @@ export interface Group {
   providedIn: 'root'
 })
 export class GroupService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = environment.apiUrl;
   private isBrowser: boolean;
 
   private groupsSubject = new BehaviorSubject<Group[]>([]);
